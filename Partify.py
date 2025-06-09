@@ -1,10 +1,8 @@
 from pydub import AudioSegment
-from pydub.utils import which
 import os
 import glob
 
 os.makedirs('StoryParts', exist_ok=True)
-# AudioSegment.converter=which('ffmpeg')
 fisiere=glob.glob('StoryVocal/*.mp3')
 durata_parte=60*1000 #ms
 
