@@ -1,39 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <base href="F:/RedditStoriesBot/RedditPostImage/Site/" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reddit Post</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #030303;
-      color: white;
-      padding: 2rem;
-      max-width: 600px;
-      margin: auto;
+      background: transparent;
+      color: black;
+      padding: 1rem;
+      font-family: 'Roboto', sans-serif;
+      font-weight: bold;
+    }
+    #reddit-logo{
+      width: 20%;
+      height: fit-content;
+    }
+    #check{
+      width: 25px;
+      height: fit-content;
+      margin-top: 7px;
+    }
+    #first-row{
+      display: flex;
+      flex-direction: row;
+    }
+    .user p{
+        font-size: 30px;
+        margin:0 5px 0 10px;
+    }
+    .user{
+      display: flex;
+      flex-direction: row;
     }
     .post {
-      border: 1px solid #555;
-      border-radius: 8px;
-      padding: 1.5rem;
-      background: #1a1a1b;
+      margin-left: auto;
+      margin-right: auto;
+      width: 50%;
+      border-radius: 2rem;
+      padding: 1rem;
+      background: white;
     }
     .title {
       font-size: 1.5rem;
-      font-weight: bold;
+      font-weight: bolder;
       margin-bottom: 1rem;
     }
     .content {
       font-size: 1rem;
       line-height: 1.5;
     }
+    .comm img{
+      width: 100%;
+    }
   </style>
 </head>
 <body>
   <div class="post">
-    <div class="title" id="title">[TITLU REDDIT]</div>
-    <div class="content" id="content">[TEXT REDDIT]</div>
+    <div id="first-row">
+      <img id="reddit-logo" src="reddit-logo.svg" alt="">
+      <div class="user">
+        <p>@RedditStores</p>
+        <img id="check" src="check.png" alt="">
+
+      </div>
+    </div>
+    <div class="title">[TITLU REDDIT]</div>
+    <div class="comm">
+      <img src="down.webp" alt="">
+    </div>
   </div>
 </body>
 </html>
