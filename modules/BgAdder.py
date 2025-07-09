@@ -59,9 +59,9 @@ def bg_adder_clip(input_video_path, output_video_path, start_ms, end_ms, new_aud
 
 
 def bg_adder():
-    os.makedirs('../VideoWithSound', exist_ok=True)
-    video_path= '../BgVideo/clip.mp4'
-    folder_path = '../StoryParts'
+    os.makedirs('temps/VideoWithSound', exist_ok=True)
+    video_path= 'BgVideo/clip.mp4'
+    folder_path = 'temps/StoryParts'
     start=1000
     dur=60*1000
 
@@ -74,12 +74,12 @@ def bg_adder():
         key=extract_story_number
     )
     for index,dir in enumerate(directories,start=1):
-        os.makedirs(f'VideoWithSound/Story{index}',exist_ok=True)
+        os.makedirs(f'temps/VideoWithSound/Story{index}',exist_ok=True)
         files = glob.glob(os.path.join(dir, "*.mp3"))
         for i,file in enumerate(files,start=1):
             bg_adder_clip(
                 video_path,
-                f'VideoWithSound/Story{index}/part_{i}.mp4',
+                f'temps/VideoWithSound/Story{index}/part_{i}.mp4',
                 start,
                 start+dur,
                 file

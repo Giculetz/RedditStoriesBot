@@ -1,4 +1,5 @@
 import os
+
 from google.cloud import speech
 import io
 import modules.mp3ToWav as mp
@@ -47,7 +48,7 @@ def generate_srt_from_words(words_with_times, srt_path):
             f.write(f"{format_srt_time(start)} --> {format_srt_time(end)}\n")
             f.write(f"{word}\n\n")
 
-def transcribe_with_word_time_offsets(speech_file_mp3):
+def transcribe_with_word_time_offsets(speech_file_mp3,isEleven):
     path = keyFinder.cauta_cel_mai_recent_fisier("F:\\CloudKey\\", "zinc-", "json")
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path
     client = speech.SpeechClient()
@@ -57,9 +58,13 @@ def transcribe_with_word_time_offsets(speech_file_mp3):
         content = audio_file.read()
 
     audio = speech.RecognitionAudio(content=content)
+    if isEleven:
+        freq=44100
+    else:
+        freq=24000
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-        sample_rate_hertz=44100,
+        sample_rate_hertz=freq,
         language_code="en-US",
         enable_word_time_offsets=True,
     )
@@ -79,13 +84,13 @@ def transcribe_with_word_time_offsets(speech_file_mp3):
 
     return results
 
-def get_subtitles():
-    os.makedirs('../Subtitles', exist_ok=True)
-    folder_path = '../StoryParts'
+def get_subtitles( isEleven=False ):
+    os.makedirs('temps/Subtitles', exist_ok=True)
+    folder_path = 'temps/StoryParts'
     directories = [d for d in glob.glob(os.path.join(folder_path, "*/")) if os.path.isdir(d)]
     for i, dir in enumerate(directories, start=1):
-        os.makedirs(f'Subtitles/Story{i}', exist_ok=True)
+        os.makedirs(f'temps/Subtitles/Story{i}', exist_ok=True)
         files = glob.glob(os.path.join(dir, "*.mp3"))
         for file_index, file in enumerate(files, start=1):
-            words_with_times = transcribe_with_word_time_offsets(file)
-            generate_srt_from_words(words_with_times, f'Subtitles/Story{i}/part_{file_index}.srt')
+            words_with_times = transcribe_with_word_time_offsets(file,isEleven)
+            generate_srt_from_words(words_with_times, f'temps/Subtitles/Story{i}/part_{file_index}.srt')

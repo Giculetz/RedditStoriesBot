@@ -1,14 +1,15 @@
 import json
 from google.cloud import texttospeech
 import os
-import keyFinder
+import modules.keyFinder as keyFinder
 
 def speechify():
     path= keyFinder.cauta_cel_mai_recent_fisier("F:\\CloudKey\\", "zinc-", "json")
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = path
     client = texttospeech.TextToSpeechClient()
-    os.makedirs("../StoryVocal", exist_ok=True)
-    os.makedirs("../Subtitles", exist_ok=True)
+
+    os.makedirs("temps/StoryVocal", exist_ok=True)
+    os.makedirs("temps/Subtitles", exist_ok=True)
     voice = texttospeech.VoiceSelectionParams(
         language_code='en-US',
         name='en-US-Wavenet-B',
@@ -33,7 +34,7 @@ def speechify():
             audio_config=audio_config
         )
 
-        with open(f'StoryVocal/story{index}.mp3', 'wb') as outfile:
+        with open(f'temps/StoryVocal/story{index}.mp3', 'wb') as outfile:
             outfile.write(response.audio_content)
 
         print('Done')

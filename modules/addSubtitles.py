@@ -72,8 +72,8 @@ def add_subtitles():
     from pushbullet import Pushbullet
 
     # pb = Pushbullet("o.mnLi8hGUluVC1yxkEWX6iP3Wi8QcP9f0")
-    os.makedirs('../VideoFinal', exist_ok=True)
-    folder_path = '../VideoWithSound'
+    os.makedirs('temps/VideoFinal', exist_ok=True)
+    folder_path = 'temps/VideoWithSound'
 
     def extract_story_number(path):
         match = re.search(r'Story(\d+)', path)
@@ -85,15 +85,15 @@ def add_subtitles():
     )
     for index,dirg in enumerate(directories,start=1):
         os.makedirs(f'VideoFinal/Story{index}', exist_ok=True)
-        files = glob.glob(f'VideoWithSound/Story{index}/*.mp4')
+        files = glob.glob(f'temps/VideoWithSound/Story{index}/*.mp4')
 
         for i,file in enumerate(files,start=1):
             # print(f"Story {index} part {i} file {file} in dir {dirg}\n")
 
             overlay_subs_on_video(
-                f'VideoWithSound/Story{index}/part_{i}.mp4',
-                f'Subtitles/Story{index}/part_{i}.srt',
+                f'temps/VideoWithSound/Story{index}/part_{i}.mp4',
+                f'temps/Subtitles/Story{index}/part_{i}.srt',
                 f'VideoFinal/Story{index}/part_{i}.mp4',
-                f'RedditPostImage/Images/Story{index}.png'
+                f'temps/RedditImages/Story{index}.png'
             )
             # pb.push_note("Fabrica de clipuri",f"Story {index} Part {i} is ready")

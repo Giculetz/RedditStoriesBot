@@ -67,8 +67,8 @@ def generate_reddit_post_screenshot(html_path, title_text, output_image_path):
     cropped.save(output_image_path, format="PNG")
 
 def ss_getter():
-    html_path= '../RedditPostImage/Site/post.html'
-    os.makedirs("../RedditPostImage/Images", exist_ok=True)
+    html_path= 'RedditPostImage/Site/post.html'
+    os.makedirs("temps/RedditImages", exist_ok=True)
     with open('stories.json', 'r', encoding='utf-8') as infile:
         data = json.load(infile)
 
@@ -77,5 +77,5 @@ def ss_getter():
         generate_reddit_post_screenshot(
             html_path,
             el['title'],
-            f'RedditPostImage/Images/Story{index}.png'
+            f'temps/RedditImages/Story{index}.png'
         )

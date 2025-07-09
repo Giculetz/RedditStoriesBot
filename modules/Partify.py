@@ -5,7 +5,7 @@ import os
 import glob
 
 def partify(input_folder):
-    os.makedirs('../StoryParts', exist_ok=True)
+    os.makedirs('temps/StoryParts', exist_ok=True)
 
     def extract_number(filename):
         match = re.search(r'(\d+)', os.path.basename(filename))
@@ -17,7 +17,7 @@ def partify(input_folder):
     for index,file in enumerate(fisiere,start=1):
         print(file)
         audio = AudioSegment.from_mp3(f"{file}")
-        os.makedirs(f'StoryParts/Story{index}',exist_ok=True)
+        os.makedirs(f'temps/StoryParts/Story{index}',exist_ok=True)
         total_length=len(audio)
         nr_parti=(total_length+durata_parte-1)//durata_parte
         for i in range (nr_parti):
@@ -30,6 +30,6 @@ def partify(input_folder):
                     end-=10*1000
 
             parte = audio[start:end]
-            parte.export(f"StoryParts/Story{index}/part_{i+1}.mp3", format="mp3")
+            parte.export(f"temps/StoryParts/Story{index}/part_{i+1}.mp3", format="mp3")
             print(f"S-a creat partea {i+1} din story ul {index}")
 
