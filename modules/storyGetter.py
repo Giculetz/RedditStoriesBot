@@ -26,8 +26,9 @@ def story_getter(nr_povesti, sub_index):
             continue  # prea lung
 
         print("\n" + "="*80)
-        print(f"TITLU: {post.title.strip()}\n")
         print(content)
+        print(f"TITLU: {post.title.strip()}\n")
+
         print("="*80)
         alegere = input("Păstrezi această poveste? (y/n): ").strip().lower()
 

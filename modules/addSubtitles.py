@@ -72,8 +72,9 @@ def add_subtitles():
     from pushbullet import Pushbullet
 
     # pb = Pushbullet("o.mnLi8hGUluVC1yxkEWX6iP3Wi8QcP9f0")
-    os.makedirs('temps/VideoFinal', exist_ok=True)
-    folder_path = 'temps/VideoWithSound'
+    cur_folder = os.path.dirname(os.path.abspath(__file__))
+    root_folder = os.path.dirname(cur_folder)
+    folder_path = os.path.join(root_folder, 'temps', 'VideoWithSound')
 
     def extract_story_number(path):
         match = re.search(r'Story(\d+)', path)
@@ -83,17 +84,41 @@ def add_subtitles():
         [d for d in glob.glob(os.path.join(folder_path, "*/")) if os.path.isdir(d)],
         key=extract_story_number
     )
+    cur_folder=os.path.dirname(os.path.abspath(__file__))
+    parent_folder=os.path.dirname(cur_folder)
+    file_path=os.path.join(parent_folder, 'output_folder.txt')
+    with open(file_path, 'r', encoding='utf-8') as f:
+        output_folder_path=f.read()
+
+    def get_max_story_number(path):
+        max_number = 0
+        for name in os.listdir(path):
+            match = re.match(r"Story(\d+)?(-postat)", name)
+            if match:
+                number = int(match.group(1))
+                if number > max_number:
+                    max_number = number
+        return max_number
+
+    start_index=get_max_story_number(output_folder_path)+1
     for index,dirg in enumerate(directories,start=1):
-        os.makedirs(f'VideoFinal/Story{index}', exist_ok=True)
-        files = glob.glob(f'temps/VideoWithSound/Story{index}/*.mp4')
+        os.makedirs(f'{output_folder_path}/Story{start_index}', exist_ok=True)
+        cur_folder = os.path.dirname(os.path.abspath(__file__))
+        parent_folder = os.path.dirname(cur_folder)
+        folder_path = os.path.join(parent_folder, 'temps', 'VideoWithSound')
+        files = glob.glob(f'{folder_path}\\Story{index}\\*.mp4')
 
         for i,file in enumerate(files,start=1):
             # print(f"Story {index} part {i} file {file} in dir {dirg}\n")
-
+            sub_path=os.path.join(parent_folder, 'temps','Subtitles',f'Story{index}')
+            sub_path=f'{sub_path}\\part_{i}.srt'
+            image_path=os.path.join(parent_folder, 'temps','RedditImages',f'Story{index}.png')
             overlay_subs_on_video(
-                f'temps/VideoWithSound/Story{index}/part_{i}.mp4',
-                f'temps/Subtitles/Story{index}/part_{i}.srt',
-                f'VideoFinal/Story{index}/part_{i}.mp4',
-                f'temps/RedditImages/Story{index}.png'
+                file,
+                sub_path,
+                f'{output_folder_path}\\Story{start_index}\\part_{i}.mp4',
+                image_path,
             )
             # pb.push_note("Fabrica de clipuri",f"Story {index} Part {i} is ready")
+        start_index=start_index+1
+

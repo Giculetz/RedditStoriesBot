@@ -1,8 +1,10 @@
 import glob
+import random
 import re
-
+from mutagen.mp3 import MP3
 import ffmpeg
 import os
+from moviepy import VideoFileClip
 
 def bg_adder_clip(input_video_path, output_video_path, start_ms, end_ms, new_audio_path):
     # Creează directoarele pentru output dacă nu există
@@ -58,11 +60,10 @@ def bg_adder_clip(input_video_path, output_video_path, start_ms, end_ms, new_aud
     os.remove('temp_audio.aac')
 
 
-def bg_adder():
+def bg_adder(video_path):
     os.makedirs('temps/VideoWithSound', exist_ok=True)
-    video_path= 'BgVideo/clip.mp4'
     folder_path = 'temps/StoryParts'
-    start=1000
+
     dur=60*1000
 
     def extract_story_number(path):
@@ -73,8 +74,17 @@ def bg_adder():
         [d for d in glob.glob(os.path.join(folder_path, "*/")) if os.path.isdir(d)],
         key=extract_story_number
     )
+    video_duration=VideoFileClip(video_path).duration
+
     for index,dir in enumerate(directories,start=1):
         os.makedirs(f'temps/VideoWithSound/Story{index}',exist_ok=True)
+        audio=MP3(f'temps/StoryVocal/story{index}.mp3')
+        audio_duration=audio.info.length
+        if video_duration - audio.info.length - 18 < 0:
+            video_path="F:\\RedditStoriesBot\\BgVideo\\clip.mp4"
+            video_duration=VideoFileClip(video_path).duration
+        start=random.randint(18,int(video_duration-audio_duration))
+        start=start*1000
         files = glob.glob(os.path.join(dir, "*.mp3"))
         for i,file in enumerate(files,start=1):
             bg_adder_clip(

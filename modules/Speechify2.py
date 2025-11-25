@@ -8,9 +8,9 @@ def speechify2():
 
     client = ElevenLabs(api_key="sk_bfa09d5be1708476259523f9b185913f70622db5af1069c2")
 
-    os.makedirs("../StoryVocal", exist_ok=True)
+    os.makedirs("temps/StoryVocal", exist_ok=True)
 
-    with open('stories.json', 'r', encoding='utf-8') as infile:
+    with open('F:\\RedditStoriesBot\\stories.json', 'r', encoding='utf-8') as infile:
         data = json.load(infile)
 
     for index, text in enumerate(data, start=1):
@@ -22,7 +22,7 @@ def speechify2():
             output_format="mp3_44100_128",
         )
 
-        with open(f'StoryVocal/story{index}.mp3', 'wb') as outfile:
+        with open(f'temps/StoryVocal/story{index}.mp3', 'wb') as outfile:
             for chunk in audio:
                 outfile.write(chunk)
         print('Done')

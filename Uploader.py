@@ -1,18 +1,29 @@
 import json
+import re
+import subprocess
+import threading
 import tkinter as tk
 import webbrowser
 from tkinter import filedialog, messagebox
-
+import keyboard
 import os
 import pyautogui as au
 import time
+
+
+def clickHere(target):
+    try:
+        location=au.locateCenterOnScreen(target,confidence=0.8)
+        au.click(location)
+    except Exception as e:
+        print(f'Error while locating {target}: {e}')
 
 
 def uploadYT():
     webbrowser.open_new_tab('https://studio.youtube.com/channel/UCTkPmvy4bIQNKrDX0OEfgdw/videos/upload?d=ud&filter=%5B%5D&sort=%7B%22columnType%22%3A%22date%22%2C%22sortOrder%22%3A%22DESCENDING%22%7D')
     au.PAUSE = 1
     target='targets/uploadYT.png'
-    time.sleep(5)
+    time.sleep(8)
     try:
         location=au.locateCenterOnScreen(target,confidence=0.8)
         au.click(location)
@@ -42,9 +53,28 @@ def uploadYT():
     for cuvant in cuvinte:
         hashtaguri += f"#{cuvant} "
     titlu = f"{data['titlu']} {hashtaguri}"
+
+    def reduce_text(text):
+        while len(text) > 100:
+            # Caută toate cuvintele de forma #ceva la finalul stringului
+            hashtags = re.findall(r'#\w+', text)
+            if not hashtags:
+                break  # dacă nu mai există hashtaguri, ieși
+            last_hashtag = hashtags[-1]
+            # elimină ultimul hashtag (doar dacă e la final sau urmat de spațiu)
+            if text.endswith(' ' + last_hashtag):
+                text = text[:text.rfind(' ' + last_hashtag)]
+            elif text.endswith(last_hashtag):
+                text = text[:text.rfind(last_hashtag)]
+            else:
+                text = text[:-1]
+        return text
+    titlu=reduce_text(titlu)
     descriere = f"{data['descriere']} {hashtaguri}"
     au.write(titlu,interval=0.05)
-    au.press('tab',presses=8)
+    target='targets/descriere_YT.png'
+    clickHere(target)
+
     au.write(descriere,interval=0.05)
     au.press('tab',presses=5)
     au.press('down')
@@ -54,16 +84,16 @@ def uploadYT():
     for cuvant in cuvinte:
         au.write(cuvant)
         au.press('enter')
-    au.press('tab',presses=22)
-    au.press('enter')
-    au.press('tab',presses=6)
-    au.press('enter')
-    au.press('tab',presses=6)
-    au.press('enter')
+    target='targets/next_YT.png'
+    for i in range(3):
+        clickHere(target)
+        time.sleep(1)
+
     au.press('tab')
     au.press('down',presses=2)
-    au.press('tab',presses=12)
-    au.press('enter')
+    time.sleep(2)
+    target='targets/YTpost.png'
+    clickHere(target)
 
     print("S-a postat pe youtube")
     time.sleep(5)
@@ -72,10 +102,12 @@ def uploadInsta():
     webbrowser.open_new_tab('https://www.instagram.com/')
     au.PAUSE = 1
     target='targets/uploadInsta.png'
-    time.sleep(5)
+    time.sleep(8)
     try:
         location=au.locateCenterOnScreen(target,confidence=0.8)
         au.click(location)
+        au.press('tab')
+        au.press('enter')
         time.sleep(0.5)
         target='targets/uploadInsta2.png'
         location=au.locateCenterOnScreen(target,confidence=0.8)
@@ -117,7 +149,7 @@ def uploadInsta():
     descriere = f"{data['descriere']} {hashtaguri}"
     au.write(descriere, interval=0.05)
 
-    au.press('tab', presses=7)
+    au.press('tab', presses=8)
     au.press('enter')
 
     print("S-a postat pe INSTA")
@@ -128,7 +160,7 @@ def uploadTT():
     webbrowser.open_new_tab('https://www.tiktok.com/tiktokstudio/upload?from=webapp')
     au.PAUSE = 1
     target='targets/uploadTT.png'
-    time.sleep(5)
+    time.sleep(8)
     try:
         location=au.locateCenterOnScreen(target,confidence=0.8)
         au.click(location)
@@ -227,27 +259,27 @@ class VideoUploaderApp:
             uploadTT()
             uploadInsta()
             uploadYT()
+            fara_extensie, extensie = os.path.splitext(self.video_path)
+            if "-postat" not in self.video_path:
+                os.rename(self.video_path, fara_extensie + "-postat" + extensie)
+            subprocess.run(["verificare_postari.bat"], shell=False)
     def submit(self):
         title = self.title_entry.get().strip()
         description = self.description_text.get("1.0", tk.END).strip()
         hashtags = self.hashtags_text.get("1.0", tk.END).strip()
-        ok=False
-        cuvinte=hashtags.split()
-        hashtaguri=""
-        for cuvant in cuvinte:
-            hashtaguri += f"#{cuvant} "
-        verificare=f'{title} {hashtaguri}'
-        if len(verificare)>100:
-            ok=True
 
-        if not title or not description or not hashtags or not self.video_path or ok:
-            if ok:
-                messagebox.showerror("Eroare", f"Titlul si hashtagurile au in total mai mult de 100 de caractere\nAu chiar {len(verificare)} caractere")
-            else:
-                messagebox.showerror("Eroare", "Toate câmpurile sunt obligatorii.")
 
+        if not title or not description or not hashtags or not self.video_path :
+            messagebox.showerror("Eroare", "Toate câmpurile sunt obligatorii.")
             return
+        filename=os.path.basename(self.video_path)
+        nume_fara_ext=os.path.splitext(filename)[0]
+        match=re.search(r'\d+', nume_fara_ext)
+        if match:
+            number = int(match.group())
 
+        title=f'Part {number}! {title}'
+        description=f'Part {number}! {description}'
         data={
             "titlu": title,
             "descriere": description,
@@ -258,12 +290,21 @@ class VideoUploaderApp:
         with open("date_upload.json", "w", encoding="utf-8") as f:
             json.dump(data, f,ensure_ascii=False, indent=4)
 
-        messagebox.showinfo("Succes", "Datele au fost preluate cu succes!")
+        messagebox.showinfo("Succes", f"Datele au fost preluate cu succes!")
         self.submited = True
         self.root.destroy()
 
 
+def listen_for_emergency_exit():
+    print("Shortcut de siguranță activ: apasă Ctrl+Alt+Q pentru a opri tot.")
+    keyboard.wait('ctrl+alt+q')
+    print("Shortcut detectat! Se închide tot...")
+    os._exit(1)
+
 if __name__ == "__main__":
+    emergency_thread = threading.Thread(target=listen_for_emergency_exit, daemon=True)
+    emergency_thread.start()
+
     root = tk.Tk()
     app = VideoUploaderApp(root)
     root.mainloop()
